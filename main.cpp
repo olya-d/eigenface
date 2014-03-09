@@ -67,12 +67,32 @@ double** read_training_data() {
 }
 
 
+Matrix transpose(Matrix *m) {
+    Matrix result;
+    result.rows = m->columns;
+    result.columns = m->rows;
+    result.array = new double*[result.rows];
+    for (int r = 0; r < result.rows; ++r)
+    {
+        result.array[r] = new double[result.columns];
+        for (int c = 0; c < result.columns; ++c)
+        {
+            result.array[r][c] = m->array[c][r];
+        }
+    }
+    return result;
+}
+
+
 int main(int argc, const char * argv[])
 {
+    // First create matrix with images as rows
     Matrix images;
     images.rows = N;
     images.columns = M;
     images.array = read_training_data();
+    // Then transpose (images as columns)
+    images = transpose(&images);
 
     return 0;
 }
