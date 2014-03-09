@@ -123,9 +123,11 @@ Matrix mean_column(Matrix *m) {
     Matrix result;
     result.rows = m->rows;
     result.columns = 1;
+    result.array = new double*[m->rows];
     for (int r = 0; r < result.rows; ++r)
     {
         int sum = 0;
+        result.array[r] = new double[m->columns];
         for (int c = 0; c < m->columns; ++c)
         {
             sum += m->array[r][c];
