@@ -10,7 +10,7 @@ const int Faces = 2;
 const int Samples = 1;
 const int Width = 92;
 const int Height = 112;
-const string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenfaces_c/faces_ascii/";
+const string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
 const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
