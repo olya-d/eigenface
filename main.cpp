@@ -5,13 +5,12 @@
 #include <cmath>
 #include <vector>
 
-using namespace std;
 
 const int Faces = 2;
 const int Samples = 1;
 const int Width = 92;
 const int Height = 112;
-const string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
+const std::string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
 const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
@@ -19,36 +18,36 @@ const int M = Width*Height; // Resolution
 struct Matrix {
     int rows;
     int columns;
-    vector< vector<double> > array;
+    std::vector< std::vector<double> > array;
 };
 
 
 void print_matrix(Matrix* m) {
-    cout << "[" << endl;
+    std::cout << "[" << std::endl;
     for (int r = 0; r < m->rows; ++r)
     {
-        cout << "[";
+        std::cout << "[";
         for (int c = 0; c < m->columns; ++c)
         {
-            cout << m->array[r][c];
+            std::cout << m->array[r][c];
             if (c != m->columns - 1)
             {
-                cout << ", ";
+                std::cout << ", ";
             }
         }
-        cout << "]";
+        std::cout << "]";
         if (r != m->rows - 1)
         {
-            cout << "," << endl;
+            std::cout << "," << std::endl;
         }
     }
-    cout << endl << "]" << endl;
+    std::cout << std::endl << "]" << std::endl;
 }
 
 
-vector<double> read_pgm(ifstream& file, int size=M) {
-    vector<double> values;
-    string line;
+std::vector<double> read_pgm(std::ifstream& file, int size=M) {
+    std::vector<double> values;
+    std::string line;
     getline(file, line); // Skip P2 line
     getline(file, line); // Skip width line
     getline(file, line); // Skip height line
@@ -62,11 +61,11 @@ vector<double> read_pgm(ifstream& file, int size=M) {
     return values;
 }
 
-void write_pgm(string file, Matrix *image) {
-    ostringstream filename;
+void write_pgm(std::string file, Matrix *image) {
+    std::stringstream filename;
     filename << file;
-    ofstream image_file(filename.str().c_str());
-    image_file << "P2" << endl << Width << endl << Height << endl << "255" << endl;
+    std::ofstream image_file(filename.str().c_str());
+    image_file << "P2" << std::endl << Width << std::endl << Height << std::endl << "255" << std::endl;
     for (int i = 0; i < M; ++i)
     {
         image_file << image->array[i][0] << " ";
@@ -74,25 +73,25 @@ void write_pgm(string file, Matrix *image) {
     image_file.close();
 }
 
-vector< vector<double> > read_training_data() {
+std::vector< std::vector<double> > read_training_data() {
     /*
     Returns pointer to the NxM array a, s.t
     a[i][j] is jth value of ith image.
     */
-    vector< vector<double> > array;
+    std::vector< std::vector<double> > array;
     for (int face = 0; face < Faces; ++face)
     {
         for (int sample = 0; sample < Samples; ++sample)
         {
-            ostringstream filename;
+            std::stringstream filename;
             filename << Data_path << "s" << face + 1 << "/" << sample  + 1 << ".pgm";
-            ifstream image(filename.str().c_str());
+            std::ifstream image(filename.str().c_str());
 
             if (image.is_open()) {
                 array.push_back(read_pgm(image));
                 image.close();
             } else {
-                cout << "Image was not opened.";
+                std::cout << "Image was not opened.";
             }
         }
     }
@@ -106,7 +105,7 @@ Matrix transpose(Matrix *m) {
     result.columns = m->rows;
     for (int r = 0; r < result.rows; ++r)
     {
-        vector<double> row;
+        std::vector<double> row;
         for (int c = 0; c < result.columns; ++c)
         {
             row.push_back(m->array[c][r]);
@@ -124,7 +123,7 @@ Matrix mean_column(Matrix *m) {
     for (int r = 0; r < result.rows; ++r)
     {
         int sum = 0;
-        vector<double> row;
+        std::vector<double> row;
         for (int c = 0; c < m->columns; ++c)
         {
             sum += m->array[r][c];
@@ -138,7 +137,7 @@ Matrix mean_column(Matrix *m) {
 
 void subtract_from_columns(Matrix *m, Matrix *v) {
     /*
-    Subtracts vector v from each column of m.
+    Subtracts std::vector v from each column of m.
     */
     for (int r = 0; r < m->rows; ++r)
     {
