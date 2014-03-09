@@ -138,6 +138,23 @@ Matrix mean_column(Matrix *m) {
 }
 
 
+void subtract_from_columns(Matrix *m, Matrix *v) {
+    /*
+    Subtracts vector v from each column of m.
+    */
+    for (int r = 0; r < m->rows; ++r)
+    {
+        for (int c = 0; c < m->columns; ++c)
+        {
+            m->array[r][c] -= v->array[r][0];
+            if (m->array[r][c] < 0)
+            {
+                m->array[r][c] = 0;
+            }
+        }
+    }
+}
+
 int main(int argc, const char * argv[])
 {
     // First create matrix with images as rows
@@ -149,6 +166,7 @@ int main(int argc, const char * argv[])
     images = transpose(&images);
     // Normalize images by subtracting the mean
     Matrix mean_image = mean_column(&images);
+    subtract_from_columns(&images, &mean_image);
 
     return 0;
 }
