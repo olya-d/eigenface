@@ -107,6 +107,23 @@ Matrix transpose(Matrix *m) {
 }
 
 
+Matrix mean_column(Matrix *m) {
+    Matrix result;
+    result.rows = m->rows;
+    result.columns = 1;
+    for (int r = 0; r < result.rows; ++r)
+    {
+        int sum = 0;
+        for (int c = 0; c < m->columns; ++c)
+        {
+            sum += m->array[r][c];
+        }
+        result.array[r][0] = sum/m->columns;
+    }
+    return result;
+}
+
+
 int main(int argc, const char * argv[])
 {
     // First create matrix with images as rows
@@ -116,6 +133,8 @@ int main(int argc, const char * argv[])
     images.array = read_training_data();
     // Then transpose (images as columns)
     images = transpose(&images);
+    // Normalize images by subtracting the mean
+    Matrix mean_image = mean_column(&images);
 
     return 0;
 }
