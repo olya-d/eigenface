@@ -22,6 +22,29 @@ struct Matrix {
 };
 
 
+void print_matrix(Matrix* m) {
+    cout << "[" << endl;
+    for (int r = 0; r < m->rows; ++r)
+    {
+        cout << "[";
+        for (int c = 0; c < m->columns; ++c)
+        {
+            cout << m->array[r][c];
+            if (c != m->columns - 1)
+            {
+                cout << ", ";
+            }
+        }
+        cout << "]";
+        if (r != m->rows - 1)
+        {
+            cout << "," << endl;
+        }
+    }
+    cout << endl << "]" << endl;
+}
+
+
 double* read_pgm(ifstream& file, int size=M) {
     double* values = new double[size];
     string line;
