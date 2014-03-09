@@ -153,6 +153,31 @@ void subtract_from_columns(Matrix *m, Matrix *v) {
 }
 
 
+Matrix multiply(Matrix *a, Matrix *b) {
+    Matrix result;
+    if (a->columns != b->rows)
+    {
+        std::cout << "Dimensions do not match" << std::endl;
+        return result;
+    }
+    result.rows = a->rows;
+    result.columns = b->columns;
+    for (int r = 0; r < result.rows; r++)
+    {
+        std::vector<double> row (result.columns, 0);
+        for (int c = 0; c < result.columns; ++c)
+        {
+            for (int k = 0; k < a->columns; ++k)
+            {
+                row[c] += a->array[r][k]*b->array[k][c];
+            }
+        }
+        result.array.push_back(row);
+    }
+    return result;
+}
+
+
 int main(int argc, const char * argv[])
 {
     // First create matrix with images as rows
@@ -161,10 +186,14 @@ int main(int argc, const char * argv[])
     images.columns = M;
     images.array = read_training_data();
     // Then transpose (images as columns)
-    images = transpose(&images);
+    Matrix images_as_columns = transpose(&images);
     // Normalize images by subtracting the mean
-    Matrix mean_image = mean_column(&images);
-    subtract_from_columns(&images, &mean_image);
+    Matrix mean_image = mean_column(&images_as_columns);
+    subtract_from_columns(&images_as_columns, &mean_image);
+
+    // Transposed covariance matrix
+    Matrix cov = multiply(&images, &images_as_columns);
+    print_matrix(&cov);
 
     return 0;
 }
