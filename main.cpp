@@ -15,6 +15,13 @@ const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
 
+struct Matrix {
+    int rows;
+    int columns;
+    double **array;
+};
+
+
 int main(int argc, const char * argv[])
 {
     Matrix images;
