@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ const int M = Width*Height; // Resolution
 struct Matrix {
     int rows;
     int columns;
-    double **array;
+    vector< vector<double> > array;
 };
 
 
@@ -45,8 +46,8 @@ void print_matrix(Matrix* m) {
 }
 
 
-double* read_pgm(ifstream& file, int size=M) {
-    double* values = new double[size];
+vector<double> read_pgm(ifstream& file, int size=M) {
+    vector<double> values;
     string line;
     getline(file, line); // Skip P2 line
     getline(file, line); // Skip width line
@@ -54,11 +55,9 @@ double* read_pgm(ifstream& file, int size=M) {
     getline(file, line); // Skip max value line
 
     int val;
-    int count = 0;
     while(file >> val)
     {
-        values[count] = val;
-        ++count;
+        values.push_back(val);
     }
     return values;
 }
@@ -75,15 +74,14 @@ void write_pgm(string file, Matrix *image) {
     image_file.close();
 }
 
-double** read_training_data() {
+vector< vector<double> > read_training_data() {
     /*
     Returns pointer to the NxM array a, s.t
     a[i][j] is jth value of ith image.
     */
-    double **array = new double*[N];
+    vector< vector<double> > array;
     for (int face = 0; face < Faces; ++face)
     {
-        array[face] = new double[M];
         for (int sample = 0; sample < Samples; ++sample)
         {
             ostringstream filename;
@@ -91,7 +89,7 @@ double** read_training_data() {
             ifstream image(filename.str().c_str());
 
             if (image.is_open()) {
-                array[face*Samples + sample] = read_pgm(image);
+                array.push_back(read_pgm(image));
                 image.close();
             } else {
                 cout << "Image was not opened.";
@@ -106,14 +104,14 @@ Matrix transpose(Matrix *m) {
     Matrix result;
     result.rows = m->columns;
     result.columns = m->rows;
-    result.array = new double*[result.rows];
     for (int r = 0; r < result.rows; ++r)
     {
-        result.array[r] = new double[result.columns];
+        vector<double> row;
         for (int c = 0; c < result.columns; ++c)
         {
-            result.array[r][c] = m->array[c][r];
+            row.push_back(m->array[c][r]);
         }
+        result.array.push_back(row);
     }
     return result;
 }
@@ -123,16 +121,16 @@ Matrix mean_column(Matrix *m) {
     Matrix result;
     result.rows = m->rows;
     result.columns = 1;
-    result.array = new double*[m->rows];
     for (int r = 0; r < result.rows; ++r)
     {
         int sum = 0;
-        result.array[r] = new double[m->columns];
+        vector<double> row;
         for (int c = 0; c < m->columns; ++c)
         {
             sum += m->array[r][c];
         }
-        result.array[r][0] = sum/m->columns;
+        row.push_back(sum/m->columns);
+        result.array.push_back(row);
     }
     return result;
 }
@@ -154,6 +152,7 @@ void subtract_from_columns(Matrix *m, Matrix *v) {
         }
     }
 }
+
 
 int main(int argc, const char * argv[])
 {
