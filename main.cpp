@@ -63,6 +63,18 @@ double* read_pgm(ifstream& file, int size=M) {
     return values;
 }
 
+void write_pgm(string file, Matrix *image) {
+    ostringstream filename;
+    filename << file;
+    ofstream image_file(filename.str().c_str());
+    image_file << "P2" << endl << Width << endl << Height << endl << "255" << endl;
+    for (int i = 0; i < M; ++i)
+    {
+        image_file << image->array[i][0] << " ";
+    }
+    image_file.close();
+}
+
 double** read_training_data() {
     /*
     Returns pointer to the NxM array a, s.t
