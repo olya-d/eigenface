@@ -32,7 +32,6 @@ std::vector<double> read_pgm(std::ifstream& file, int size=M) {
     }
     return values;
 }
-
 void write_pgm(std::string file, Matrix *image) {
     std::stringstream filename;
     filename << file;
@@ -44,7 +43,6 @@ void write_pgm(std::string file, Matrix *image) {
     }
     image_file.close();
 }
-
 std::vector< std::vector<double> > read_training_data() {
     /*
      Returns pointer to the NxM array a, s.t
@@ -69,9 +67,9 @@ std::vector< std::vector<double> > read_training_data() {
     }
     return array;
 }
+/****/
 
 /* Work with matrices */
-
 Matrix mean_column(const Matrix& m) {
     std::vector< std::vector<double> > array;
     for (int r = 0; r < m.rows; ++r)
@@ -87,8 +85,6 @@ Matrix mean_column(const Matrix& m) {
     }
     return Matrix(m.rows, 1, array);
 }
-
-
 void subtract_from_columns(Matrix *m, Matrix *v) {
     /*
      Subtracts std::vector v from each column of m.
@@ -105,7 +101,6 @@ void subtract_from_columns(Matrix *m, Matrix *v) {
         }
     }
 }
-
 Matrix multiply_columns(const Matrix& a, const Matrix& b) {
     Matrix result = Matrix(b.rows, a.columns);
     for (int c = 0; c < a.columns; ++c)
@@ -115,6 +110,7 @@ Matrix multiply_columns(const Matrix& a, const Matrix& b) {
     }
     return result;
 }
+/****/
 
 
 int main(int argc, const char * argv[])
