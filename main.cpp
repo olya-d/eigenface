@@ -10,13 +10,14 @@ const int Faces = 2;
 const int Samples = 1;
 const int Width = 92;
 const int Height = 112;
-const std::string Data_path = "/Users/olga/Dropbox/Developer/eigenface/faces/";
+const std::string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
 const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
 
-struct Matrix
+class Matrix
 {
+public:
     int rows;
     int columns;
     std::vector< std::vector<double> > array;
@@ -30,6 +31,11 @@ struct Matrix
     {
         rows = number_of_rows;
         columns = number_of_columns;
+        for (int r = 0; r < rows; ++r)
+        {
+            std::vector<double> row (columns, 0);
+            array.push_back(row);
+        }
     }
     Matrix(int number_of_rows, int number_of_columns, std::vector< std::vector<double> > elements)
     {
@@ -70,19 +76,20 @@ struct Matrix
     }
     Matrix transpose()
     {
-        Matrix result = Matrix(columns, rows);
-        for (int r = 0; r < result.rows; ++r)
+        // Matrix result = Matrix(columns, rows);
+        std::vector< std::vector<double> > result_array;
+        for (int r = 0; r < columns; ++r)
         {
             std::vector<double> row;
-            for (int c = 0; c < result.columns; ++c)
+            for (int c = 0; c < rows; ++c)
             {
                 row.push_back(array[c][r]);
             }
-            result.array.push_back(row);
+            result_array.push_back(row);
         }
-        return result;
+        return Matrix(columns, rows, result_array);
     }
-    Matrix getColumn(int number_of_column)
+    Matrix getColumn(int number_of_column) const
     {
         if (number_of_column < 0 || number_of_column >= columns)
         {
@@ -115,9 +122,29 @@ struct Matrix
             array[r][number_of_column] = vector.array[r][0];
         }
     }
+    friend Matrix operator* (const Matrix& a, const Matrix& b)
+    {
+        if (a.columns != b.rows)
+        {
+            std::cout << "Error: dimensions do not match" << std::endl;
+            return Matrix();
+        }
+        Matrix result = Matrix(a.rows, b.columns);
+        for (int r = 0; r < a.rows; r++)
+        {
+            for (int c = 0; c < b.columns; ++c)
+            {
+                for (int k = 0; k < a.columns; ++k)
+                {
+                    result.array[r][c] += a.array[r][k]*b.array[k][c];
+                }
+            }
+        }
+        return result;
+    }
 };
 
-
+/* Work with data */
 std::vector<double> read_pgm(std::ifstream& file, int size=M) {
     std::vector<double> values;
     std::string line;
@@ -148,9 +175,9 @@ void write_pgm(std::string file, Matrix *image) {
 
 std::vector< std::vector<double> > read_training_data() {
     /*
-    Returns pointer to the NxM array a, s.t
-    a[i][j] is jth value of ith image.
-    */
+     Returns pointer to the NxM array a, s.t
+     a[i][j] is jth value of ith image.
+     */
     std::vector< std::vector<double> > array;
     for (int face = 0; face < Faces; ++face)
     {
@@ -171,47 +198,28 @@ std::vector< std::vector<double> > read_training_data() {
     return array;
 }
 
-
-Matrix transpose(Matrix *m) {
-    Matrix result;
-    result.rows = m->columns;
-    result.columns = m->rows;
-    for (int r = 0; r < result.rows; ++r)
+/* Work with matrices */
+Matrix mean_column(const Matrix& m) {
+    std::vector< std::vector<double> > array;
+    for (int r = 0; r < m.rows; ++r)
     {
+        double sum = 0;
         std::vector<double> row;
-        for (int c = 0; c < result.columns; ++c)
+        for (int c = 0; c < m.columns; ++c)
         {
-            row.push_back(m->array[c][r]);
+            sum += m.array[r][c];
         }
-        result.array.push_back(row);
+        row.push_back(sum/m.columns);
+        array.push_back(row);
     }
-    return result;
-}
-
-
-Matrix mean_column(Matrix *m) {
-    Matrix result;
-    result.rows = m->rows;
-    result.columns = 1;
-    for (int r = 0; r < result.rows; ++r)
-    {
-        int sum = 0;
-        std::vector<double> row;
-        for (int c = 0; c < m->columns; ++c)
-        {
-            sum += m->array[r][c];
-        }
-        row.push_back(sum/m->columns);
-        result.array.push_back(row);
-    }
-    return result;
+    return Matrix(m.rows, 1, array);
 }
 
 
 void subtract_from_columns(Matrix *m, Matrix *v) {
     /*
-    Subtracts std::vector v from each column of m.
-    */
+     Subtracts std::vector v from each column of m.
+     */
     for (int r = 0; r < m->rows; ++r)
     {
         for (int c = 0; c < m->columns; ++c)
@@ -223,31 +231,6 @@ void subtract_from_columns(Matrix *m, Matrix *v) {
             }
         }
     }
-}
-
-
-Matrix multiply(Matrix *a, Matrix *b) {
-    Matrix result;
-    if (a->columns != b->rows)
-    {
-        std::cout << "Dimensions do not match" << std::endl;
-        return result;
-    }
-    result.rows = a->rows;
-    result.columns = b->columns;
-    for (int r = 0; r < result.rows; r++)
-    {
-        std::vector<double> row (result.columns, 0);
-        for (int c = 0; c < result.columns; ++c)
-        {
-            for (int k = 0; k < a->columns; ++k)
-            {
-                row[c] += a->array[r][k]*b->array[k][c];
-            }
-        }
-        result.array.push_back(row);
-    }
-    return result;
 }
 
 
@@ -398,23 +381,14 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
 }
 
 
-Matrix multiply_columns(Matrix* a, Matrix*b) {
-    Matrix result;
-    Matrix at = transpose(a);
-    result.rows = b->columns;
-    result.columns = b->rows;
-    for (int r = 0; r < result.rows; ++r)
+Matrix multiply_columns(const Matrix& a, const Matrix& b) {
+    Matrix result = Matrix(b.rows, a.columns);
+    for (int c = 0; c < a.columns; ++c)
     {
-        Matrix eigenvector;
-        eigenvector.rows = 1;
-        eigenvector.columns = at.columns;
-        eigenvector.array.push_back(at.array[r]);
-        Matrix eigenvector_t = transpose(&eigenvector);
-        eigenvector = multiply(b, &eigenvector_t);
-        eigenvector = transpose(&eigenvector);
-        result.array.push_back(eigenvector.array[0]);
+        Matrix a_column = a.getColumn(c);
+        result.setColumn(c, b*a_column);
     }
-    return transpose(&result);
+    return result;
 }
 
 
@@ -423,15 +397,17 @@ int main(int argc, const char * argv[])
     // First create matrix with images as rows
     Matrix images = Matrix(N, M, read_training_data());
     // Then transpose (images as columns)
-    Matrix images_as_columns = transpose(&images);
+    Matrix images_as_columns = images.transpose();
     // Normalize images by subtracting the mean
-    Matrix mean_image = mean_column(&images_as_columns);
+    Matrix mean_image = mean_column(images_as_columns);
     subtract_from_columns(&images_as_columns, &mean_image);
+    images = images_as_columns.transpose();
 
     // Transposed covariance matrix
-    Matrix cov = multiply(&images, &images_as_columns);
+    Matrix cov = images*images_as_columns;
+    cov.print();
     Matrix eigenvectors_of_cov = eigensystem(&cov).second;
-    Matrix eigenfaces = multiply_columns(&eigenvectors_of_cov, &images_as_columns);
+    Matrix eigenfaces = multiply_columns(eigenvectors_of_cov, images_as_columns);
 
     return 0;
 }
