@@ -82,6 +82,39 @@ struct Matrix
         }
         return result;
     }
+    Matrix getColumn(int number_of_column)
+    {
+        if (number_of_column < 0 || number_of_column >= columns)
+        {
+            std::cout << "Error: column number is out of range" << std::endl;
+            return Matrix();
+        }
+        std::vector< std::vector<double> > column_values;
+        for (int r = 0; r < rows; ++r)
+        {
+            std::vector<double> row;
+            row.push_back(array[r][number_of_column]);
+            column_values.push_back(row);
+        }
+        return Matrix(rows, 1, column_values);
+    }
+    void setColumn(int number_of_column, Matrix vector)
+    {
+        if (number_of_column < 0 || number_of_column >= columns)
+        {
+            std::cout << "Error: column number is out of range" << std::endl;
+            return;
+        }
+        if (rows != vector.rows)
+        {
+            std::cout << "Error: number of rows does not match" << std::endl;
+            return;
+        }
+        for (int r = 0; r < rows; ++r)
+        {
+            array[r][number_of_column] = vector.array[r][0];
+        }
+    }
 };
 
 
