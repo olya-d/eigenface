@@ -15,6 +15,7 @@ public:
     void print();
     Matrix transpose();
     Matrix getColumn(int number_of_column) const;
+    Matrix getRow(int number_of_row) const;
     void setColumn(int number_of_column, Matrix vector);
     friend Matrix operator* (const Matrix& a, const Matrix& b);
 };

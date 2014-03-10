@@ -91,6 +91,17 @@ Matrix Matrix::getColumn(int number_of_column) const
     }
     return Matrix(rows, 1, column_values);
 }
+Matrix Matrix::getRow(int number_of_row) const
+{
+    if (number_of_row < 0 || number_of_row >= rows)
+    {
+        std::cout << "Error: row number is out of range" << std::endl;
+        return Matrix();
+    }
+    std::vector< std::vector<double> > row;
+    row.push_back(array[number_of_row]);
+    return Matrix(1, columns, row);
+}
 void Matrix::setColumn(int number_of_column, Matrix vector)
 {
     if (number_of_column < 0 || number_of_column >= columns)
