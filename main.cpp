@@ -10,39 +10,66 @@ const int Faces = 2;
 const int Samples = 1;
 const int Width = 92;
 const int Height = 112;
-const std::string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
+const std::string Data_path = "/Users/olga/Dropbox/Developer/eigenface/faces/";
 const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
 
-struct Matrix {
+struct Matrix
+{
     int rows;
     int columns;
     std::vector< std::vector<double> > array;
-};
-
-
-void print_matrix(Matrix* m) {
-    std::cout << "[" << std::endl;
-    for (int r = 0; r < m->rows; ++r)
+    Matrix()
     {
-        std::cout << "[";
-        for (int c = 0; c < m->columns; ++c)
+        rows = 0;
+        columns = 0;
+    };
+    /* Constructors */
+    Matrix(int number_of_rows, int number_of_columns)
+    {
+        rows = number_of_rows;
+        columns = number_of_columns;
+    }
+    Matrix(int number_of_rows, int number_of_columns, std::vector< std::vector<double> > elements)
+    {
+        rows = number_of_rows;
+        columns = number_of_columns;
+        if (elements.size() != number_of_rows)
         {
-            std::cout << m->array[r][c];
-            if (c != m->columns - 1)
+            std::cout << "Warning: number of rows does not match elements." << std::endl;
+        }
+        if (rows > 0 && elements[0].size() != number_of_columns)
+        {
+            std::cout << "Warning: number of columns does not match elements." << std::endl;
+        }
+        array = elements;
+    }
+    /* Methods */
+    void print()
+    {
+        std::cout << "[" << std::endl;
+        for (int r = 0; r < rows; ++r)
+        {
+            std::cout << "[";
+            for (int c = 0; c < columns; ++c)
             {
-                std::cout << ", ";
+                std::cout << array[r][c];
+                if (c != columns - 1)
+                {
+                    std::cout << ", ";
+                }
+            }
+            std::cout << "]";
+            if (r != rows - 1)
+            {
+                std::cout << "," << std::endl;
             }
         }
-        std::cout << "]";
-        if (r != m->rows - 1)
-        {
-            std::cout << "," << std::endl;
-        }
+        std::cout << std::endl << "]" << std::endl;
     }
-    std::cout << std::endl << "]" << std::endl;
-}
+
+};
 
 
 std::vector<double> read_pgm(std::ifstream& file, int size=M) {
@@ -348,10 +375,7 @@ Matrix multiply_columns(Matrix* a, Matrix*b) {
 int main(int argc, const char * argv[])
 {
     // First create matrix with images as rows
-    Matrix images;
-    images.rows = N;
-    images.columns = M;
-    images.array = read_training_data();
+    Matrix images = Matrix(N, M, read_training_data());
     // Then transpose (images as columns)
     Matrix images_as_columns = transpose(&images);
     // Normalize images by subtracting the mean
@@ -362,8 +386,6 @@ int main(int argc, const char * argv[])
     Matrix cov = multiply(&images, &images_as_columns);
     Matrix eigenvectors_of_cov = eigensystem(&cov).second;
     Matrix eigenfaces = multiply_columns(&eigenvectors_of_cov, &images_as_columns);
-
-    print_matrix(&eigenfaces);
 
     return 0;
 }
