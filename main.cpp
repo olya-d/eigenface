@@ -68,7 +68,20 @@ struct Matrix
         }
         std::cout << std::endl << "]" << std::endl;
     }
-
+    Matrix transpose()
+    {
+        Matrix result = Matrix(columns, rows);
+        for (int r = 0; r < result.rows; ++r)
+        {
+            std::vector<double> row;
+            for (int c = 0; c < result.columns; ++c)
+            {
+                row.push_back(array[c][r]);
+            }
+            result.array.push_back(row);
+        }
+        return result;
+    }
 };
 
 
