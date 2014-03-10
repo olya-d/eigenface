@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include "matrix.h"
 
 
 const int Faces = 2;
@@ -14,135 +15,6 @@ const std::string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface
 const int N = Faces*Samples; // Total number of images
 const int M = Width*Height; // Resolution
 
-
-class Matrix
-{
-public:
-    int rows;
-    int columns;
-    std::vector< std::vector<double> > array;
-    Matrix()
-    {
-        rows = 0;
-        columns = 0;
-    };
-    /* Constructors */
-    Matrix(int number_of_rows, int number_of_columns)
-    {
-        rows = number_of_rows;
-        columns = number_of_columns;
-        for (int r = 0; r < rows; ++r)
-        {
-            std::vector<double> row (columns, 0);
-            array.push_back(row);
-        }
-    }
-    Matrix(int number_of_rows, int number_of_columns, std::vector< std::vector<double> > elements)
-    {
-        rows = number_of_rows;
-        columns = number_of_columns;
-        if (elements.size() != number_of_rows)
-        {
-            std::cout << "Warning: number of rows does not match elements." << std::endl;
-        }
-        if (rows > 0 && elements[0].size() != number_of_columns)
-        {
-            std::cout << "Warning: number of columns does not match elements." << std::endl;
-        }
-        array = elements;
-    }
-    /* Methods */
-    void print()
-    {
-        std::cout << "[" << std::endl;
-        for (int r = 0; r < rows; ++r)
-        {
-            std::cout << "[";
-            for (int c = 0; c < columns; ++c)
-            {
-                std::cout << array[r][c];
-                if (c != columns - 1)
-                {
-                    std::cout << ", ";
-                }
-            }
-            std::cout << "]";
-            if (r != rows - 1)
-            {
-                std::cout << "," << std::endl;
-            }
-        }
-        std::cout << std::endl << "]" << std::endl;
-    }
-    Matrix transpose()
-    {
-        // Matrix result = Matrix(columns, rows);
-        std::vector< std::vector<double> > result_array;
-        for (int r = 0; r < columns; ++r)
-        {
-            std::vector<double> row;
-            for (int c = 0; c < rows; ++c)
-            {
-                row.push_back(array[c][r]);
-            }
-            result_array.push_back(row);
-        }
-        return Matrix(columns, rows, result_array);
-    }
-    Matrix getColumn(int number_of_column) const
-    {
-        if (number_of_column < 0 || number_of_column >= columns)
-        {
-            std::cout << "Error: column number is out of range" << std::endl;
-            return Matrix();
-        }
-        std::vector< std::vector<double> > column_values;
-        for (int r = 0; r < rows; ++r)
-        {
-            std::vector<double> row;
-            row.push_back(array[r][number_of_column]);
-            column_values.push_back(row);
-        }
-        return Matrix(rows, 1, column_values);
-    }
-    void setColumn(int number_of_column, Matrix vector)
-    {
-        if (number_of_column < 0 || number_of_column >= columns)
-        {
-            std::cout << "Error: column number is out of range" << std::endl;
-            return;
-        }
-        if (rows != vector.rows)
-        {
-            std::cout << "Error: number of rows does not match" << std::endl;
-            return;
-        }
-        for (int r = 0; r < rows; ++r)
-        {
-            array[r][number_of_column] = vector.array[r][0];
-        }
-    }
-    friend Matrix operator* (const Matrix& a, const Matrix& b)
-    {
-        if (a.columns != b.rows)
-        {
-            std::cout << "Error: dimensions do not match" << std::endl;
-            return Matrix();
-        }
-        Matrix result = Matrix(a.rows, b.columns);
-        for (int r = 0; r < a.rows; r++)
-        {
-            for (int c = 0; c < b.columns; ++c)
-            {
-                for (int k = 0; k < a.columns; ++k)
-                {
-                    result.array[r][c] += a.array[r][k]*b.array[k][c];
-                }
-            }
-        }
-        return result;
-    }
-};
 
 /* Work with data */
 std::vector<double> read_pgm(std::ifstream& file, int size=M) {
@@ -258,7 +130,6 @@ Matrix identity_matrix(int dimension)
     return I;
 }
 
-
 std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
     /*
      Using Jacobi eigenvalue method, returns pair:
@@ -279,9 +150,9 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
         }
         A.array.push_back(row);
     }
-
+    
     std::vector<double> eigenvalues;
-
+    
     for (int it = 0; it < max_rotations; ++it)
     {
         double max = 0, k, l;
@@ -317,13 +188,13 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
                     P.array[r][c] = P.array[r][c]/lenght;
                 }
             }
-
+            
             std::pair<std::vector<double>, Matrix> result(eigenvalues, P);
             return result;
         }
         // Perform rotation
         double diff = A.array[l][l] - A.array[k][k];
-
+        
         double t;
         if (abs(A.array[k][l]) < abs(diff)*1.0e-36)
         {
@@ -345,7 +216,7 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
         A.array[k][l] = 0;
         A.array[k][k] = A.array[k][k] - t*temp;
         A.array[l][l] = A.array[l][l] + t*temp;
-
+        
         for (int i = 0; i < k; ++i)
         {
             temp = A.array[i][k];
@@ -379,6 +250,7 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
     std::pair<std::vector<double>, Matrix> result(eigenvalues, P);
     return result;
 }
+
 
 
 Matrix multiply_columns(const Matrix& a, const Matrix& b) {
