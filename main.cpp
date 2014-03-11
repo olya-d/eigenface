@@ -56,6 +56,7 @@ std::vector< std::vector<double> > read_training_data() {
     std::vector< std::vector<double> > array;
     for (int face = 0; face < Faces; ++face)
     {
+        std::vector< std::vector<double> > facearray;
         for (int sample = 0; sample < Samples; ++sample)
         {
             std::stringstream filename;
@@ -63,12 +64,24 @@ std::vector< std::vector<double> > read_training_data() {
             std::ifstream image(filename.str().c_str());
 
             if (image.is_open()) {
-                array.push_back(read_pgm(image));
+                facearray.push_back(read_pgm(image));
                 image.close();
             } else {
                 std::cout << "Image was not opened.";
             }
         }
+        /* Find mean */
+        std::vector<double> mean;
+        for (int i = 0; i < M; ++i)
+        {
+            double sum = 0;
+            for (int j = 0; j < Samples; ++j)
+            {
+                sum += facearray[j][i];
+            }
+            mean.push_back(sum/Samples);
+        }
+        array.push_back(mean);
     }
     return array;
 }
