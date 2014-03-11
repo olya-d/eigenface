@@ -7,12 +7,13 @@
 #include "eigen.h"
 
 
-const int Faces = 2;
-const int Samples = 1;
+const int Faces = 40;
+const int Samples = 5;
 const int Width = 92;
 const int Height = 112;
-const std::string Data_path = "/Users/olga_andreyeva/Dropbox/Developer/eigenface/faces/";
-const int N = Faces*Samples; // Total number of images
+const int Eigenfaces = 27;
+const std::string Data_path = "/Users/olga/Dropbox/Developer/eigenface/faces/";
+const int N = Faces; // Total number of images
 const int M = Width*Height; // Resolution
 
 
