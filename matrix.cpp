@@ -1,12 +1,6 @@
-//
-//  Matrix.cpp
-//  eigenfaces2
-//
-//  Created by Olga on 3/10/14.
-//  Copyright (c) 2014 Olga Andreyeva. All rights reserved.
-//
-
 #include "matrix.h"
+#include <iomanip>
+
 
 Matrix::Matrix()
 {
@@ -41,6 +35,8 @@ Matrix::Matrix(int number_of_rows, int number_of_columns, std::vector< std::vect
 /* Methods */
 void Matrix::print()
 {
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2);
     std::cout << "[" << std::endl;
     for (int r = 0; r < rows; ++r)
     {
