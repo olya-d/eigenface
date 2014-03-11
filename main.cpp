@@ -39,7 +39,12 @@ void write_pgm(std::string file, Matrix *image) {
     image_file << "P2" << std::endl << Width << std::endl << Height << std::endl << "255" << std::endl;
     for (int i = 0; i < M; ++i)
     {
-        image_file << image->array[i][0] << " ";
+        int val = image->array[0][i];
+        if (val < 0)
+        {
+            val = 0;
+        }
+        image_file << val << " ";
     }
     image_file.close();
 }
