@@ -1,5 +1,6 @@
 #include "eigen.h"
 #include <cmath>
+#include <algorithm>
 
 
 Matrix identity_matrix(int dimension)
@@ -16,6 +17,32 @@ Matrix identity_matrix(int dimension)
         }
     }
     return I;
+}
+
+std::pair<std::vector<double>, Matrix> sort_by_eigenvalues(std::pair<std::vector<double>, Matrix> system)
+{
+    for (int i = 0; i < system.first.size() - 1; ++i)
+    {
+        int index = i;
+        double value = system.first[i];
+        for (int j = i + 1; j < system.first.size(); ++j)
+        {
+            if (system.first[j] > value)
+            {
+                index = j;
+                value = system.first[j];
+            }
+        }
+        if (index != i)
+        {
+            std::swap(system.first[i], system.first[index]);
+            for (int r = 0; r < system.second.rows; ++r)
+            {
+                std::swap(system.second.array[r][i], system.second.array[r][index]);
+            }
+        }
+    }
+    return system;
 }
 
 
@@ -50,9 +77,9 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
         {
             for (int c = r + 1; c < A.rows; ++c)
             {
-                if (abs(A.array[r][c]) >= max)
+                if (fabs(A.array[r][c]) >= max)
                 {
-                    max = abs(A.array[r][c]);
+                    max = fabs(A.array[r][c]);
                     k = r;
                     l = c;
                 }
@@ -79,20 +106,20 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
             }
 
             std::pair<std::vector<double>, Matrix> result(eigenvalues, P);
-            return result;
+            return sort_by_eigenvalues(result);
         }
         // Perform rotation
         double diff = A.array[l][l] - A.array[k][k];
 
         double t;
-        if (abs(A.array[k][l]) < abs(diff)*1.0e-36)
+        if (fabs(A.array[k][l]) < fabs(diff)*1.0e-36)
         {
             t = A.array[k][l]/diff;
         }
         else
         {
             double phi = diff/(2.0*A.array[k][l]);
-            t = 1.0/(abs(phi) + sqrt(phi*phi + 1.0));
+            t = 1.0/(fabs(phi) + sqrt(phi*phi + 1.0));
             if (phi < 0)
             {
                 t = -t;
@@ -137,5 +164,5 @@ std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
         eigenvalues.push_back(A.array[i][i]);
     }
     std::pair<std::vector<double>, Matrix> result(eigenvalues, P);
-    return result;
+    return sort_by_eigenvalues(result);
 }
