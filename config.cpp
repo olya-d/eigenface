@@ -10,3 +10,4 @@ const std::string DataPath = "faces/";
 const int N = Faces; // Total number of images
 const int M = Width*Height; // Resolution
 const std::string SampleName = "10";
+const int MaxValue = 255;

@@ -28,7 +28,7 @@ void write_pgm(std::string file, Matrix *image) {
     std::stringstream filename;
     filename << file;
     std::ofstream image_file(filename.str().c_str());
-    image_file << "P2" << std::endl << Width << std::endl << Height << std::endl << "255" << std::endl;
+    image_file << "P2" << std::endl << Width << std::endl << Height << std::endl << MaxValue << std::endl;
     for (int i = 0; i < M; ++i)
     {
         int val = image->array[0][i];
