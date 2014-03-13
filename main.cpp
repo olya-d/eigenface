@@ -52,7 +52,7 @@ std::vector< std::vector<double> > read_training_data() {
         for (int sample = 0; sample < Samples; ++sample)
         {
             std::stringstream filename;
-            filename << Data_path << "s" << face + 1 << "/" << sample  + 1 << ".pgm";
+            filename << DataPath << "s" << face + 1 << "/" << sample  + 1 << ".pgm";
             std::ifstream image(filename.str().c_str());
 
             if (image.is_open()) {
@@ -198,7 +198,7 @@ int main(int argc, const char * argv[])
     for (int i = 1; i <= N; ++i)
     {
         std::stringstream filename;
-        filename << Data_path << "s" << i << "/" << 10 << ".pgm";
+        filename << DataPath << "s" << i << "/" << SampleName << ".pgm";
         std::ifstream image(filename.str().c_str());
         std::vector< std::vector<double> > array;
 
