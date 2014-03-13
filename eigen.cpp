@@ -48,9 +48,9 @@ std::pair<std::vector<double>, Matrix> sort_by_eigenvalues(std::pair<std::vector
 
 std::pair<std::vector<double>, Matrix> eigensystem(Matrix *m) {
     /*
-     Using Jacobi eigenvalue method, returns pair:
-     vector of eigenvalues and matrix, which columns are eigenvectors.
-     */
+    Using Jacobi eigenvalue method, returns pair:
+    vector of eigenvalues and matrix, which columns are eigenvectors.
+    */
     Matrix A; // will become diagonal
     A.rows = m->rows;
     A.columns = m->columns;

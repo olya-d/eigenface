@@ -71,22 +71,6 @@ Matrix Matrix::transpose()
     }
     return Matrix(columns, rows, result_array);
 }
-Matrix Matrix::getColumn(int number_of_column) const
-{
-    if (number_of_column < 0 || number_of_column >= columns)
-    {
-        std::cout << "Error: column number is out of range" << std::endl;
-        return Matrix();
-    }
-    std::vector< std::vector<double> > column_values;
-    for (int r = 0; r < rows; ++r)
-    {
-        std::vector<double> row;
-        row.push_back(array[r][number_of_column]);
-        column_values.push_back(row);
-    }
-    return Matrix(rows, 1, column_values);
-}
 Matrix Matrix::getRow(int number_of_row) const
 {
     if (number_of_row < 0 || number_of_row >= rows)
@@ -97,23 +81,6 @@ Matrix Matrix::getRow(int number_of_row) const
     std::vector< std::vector<double> > row;
     row.push_back(array[number_of_row]);
     return Matrix(1, columns, row);
-}
-void Matrix::setColumn(int number_of_column, Matrix vector)
-{
-    if (number_of_column < 0 || number_of_column >= columns)
-    {
-        std::cout << "Error: column number is out of range" << std::endl;
-        return;
-    }
-    if (rows != vector.rows)
-    {
-        std::cout << "Error: number of rows does not match" << std::endl;
-        return;
-    }
-    for (int r = 0; r < rows; ++r)
-    {
-        array[r][number_of_column] = vector.array[r][0];
-    }
 }
 Matrix operator* (const Matrix& a, const Matrix& b)
 {

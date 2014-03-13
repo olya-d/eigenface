@@ -1,9 +1,20 @@
 #include <iostream>
 #include <vector>
 
+
+/*
+A basic matrix class.
+With this class it is possible to:
+- create 2D matrices
+- print matrices
+- tranpose matrices
+- fetch specific row as a new matrix
+- multiply matrices
+*/
 class Matrix
 {
 public:
+    /* Attributes */
     int rows;
     int columns;
     std::vector< std::vector<double> > array;
@@ -14,8 +25,6 @@ public:
     /* Methods */
     void print();
     Matrix transpose();
-    Matrix getColumn(int number_of_column) const;
     Matrix getRow(int number_of_row) const;
-    void setColumn(int number_of_column, Matrix vector);
     friend Matrix operator* (const Matrix& a, const Matrix& b);
 };
