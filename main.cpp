@@ -161,7 +161,7 @@ int main(int argc, const char * argv[])
     }
 
     /* Output the mean image */
-    write_pgm("meanimage.pgm", &B);
+    write_pgm("output/meanimage.pgm", &B);
 
     /* Subtract the mean from each image */
     for (int r = 0; r < N; ++r)
@@ -181,7 +181,7 @@ int main(int argc, const char * argv[])
     {
         Matrix image = A.getRow(i);
         std::ostringstream filename;
-        filename << "normalized" << i << ".pgm";
+        filename << "output/normalized/" << i << ".pgm";
         write_pgm(filename.str(), &image);
     }
 
@@ -209,7 +209,7 @@ int main(int argc, const char * argv[])
         /* Output eigenface */
         eigenface = scale(U.getRow(r));
         std::ostringstream filename;
-        filename << "eigenfaces" << r << ".pgm";
+        filename << "output/eigenfaces/" << r << ".pgm";
         write_pgm(filename.str(), &eigenface);
     }
 
