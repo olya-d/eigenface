@@ -132,6 +132,47 @@ Matrix scale(Matrix m, double min = 0, double max = 255) {
 }
 /****/
 
+/*
+Recognizes the photo. See main() for explanation of X, B, U, W.
+Returns the number of matched person in the training set.
+*/
+int recognize(Matrix X, Matrix B, Matrix U, Matrix W) {
+    /* Subtract the mean image */
+    for (int c = 0; c < M; ++c)
+    {
+        X.array[0][c] -= B.array[0][c];
+        if (X.array[0][c] < 0)
+        {
+            X.array[0][c] = 0;
+        }
+    }
+
+    /* Find weights */
+    Matrix Wx = Matrix(Eigenfaces, 1);
+    for (int r = 0; r < Eigenfaces; ++r)
+    {
+        Wx.array[r][0] = (U.getRow(r)*X.transpose()).array[0][0];
+    }
+
+    /* Find the closest face from the trainig set */
+    double min_distance = 0;
+    int image_number = 0;
+    for (int image = 0; image < N; ++image)
+    {
+        double distance = 0;
+        for (int eigenface = 0; eigenface < Eigenfaces; ++eigenface)
+        {
+            distance += fabs(W.array[eigenface][image] - Wx.array[eigenface][0]);
+        }
+        if (distance < min_distance || image == 0)
+        {
+            min_distance = distance;
+            image_number = image;
+        }
+    }
+    return image_number;
+}
+
 
 int main(int argc, const char * argv[])
 {
@@ -224,6 +265,25 @@ int main(int argc, const char * argv[])
     }
 
     /* Perform recognition */
+
+    if (argc == 2)
+    {
+        /* Classify the image from the arguments */
+        std::ifstream image(argv[1]);
+        std::vector< std::vector<double> > array;
+        if (image.is_open()) {
+            array.push_back(read_pgm(image));
+            image.close();
+        } else {
+            std::cout << "Error: could not open image specified in the arguments.";
+            return 0;
+        }
+
+        Matrix X = Matrix(1, M, array);
+        std::cout << recognize(X, B, U, W) + 1;
+        return 0;
+    }
+
     double accuracy = 0;
     for (int i = 1; i <= N; ++i)
     {
@@ -240,41 +300,9 @@ int main(int argc, const char * argv[])
             std::cout << "Image was not opened.";
         }
         Matrix X = Matrix(1, M, array);
+        int image_number = recognize(X, B, U, W);
 
-        /* Subtract the mean image */
-        for (int c = 0; c < M; ++c)
-        {
-            X.array[0][c] -= B.array[0][c];
-            if (X.array[0][c] < 0)
-            {
-                X.array[0][c] = 0;
-            }
-        }
-
-        /* Find weights */
-        Matrix Wx = Matrix(Eigenfaces, 1);
-        for (int r = 0; r < Eigenfaces; ++r)
-        {
-            Wx.array[r][0] = (U.getRow(r)*X.transpose()).array[0][0];
-        }
-
-        /* Find the closest face from the trainig set */
-        double min_distance = 0;
-        int image_number = 0;
-        for (int image = 0; image < N; ++image)
-        {
-            double distance = 0;
-            for (int eigenface = 0; eigenface < Eigenfaces; ++eigenface)
-            {
-                distance += fabs(W.array[eigenface][image] - Wx.array[eigenface][0]);
-            }
-            if (distance < min_distance || image == 0)
-            {
-                min_distance = distance;
-                image_number = image;
-            }
-        }
-        std::cout << i << ". " << image_number + 1 << " " << min_distance << std::endl;
+        std::cout << i << ". " << image_number + 1 << std::endl;
         if (i == image_number + 1)
         {
             accuracy = accuracy + 1;
